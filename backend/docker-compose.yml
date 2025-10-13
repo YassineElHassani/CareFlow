@@ -1,0 +1,104 @@
+version: "3.8"
+
+services:
+  # Main API Application
+  app:
+    build:
+      context: .
+      target: development
+    container_name: careflow_app
+    env_file: .env.docker
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+      - redis
+      - maildev
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
+      - ./package-lock.json:/usr/src/app/package-lock.json
+    command: npm run dev
+    networks:
+      - careflow_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Email Worker (Background Jobs)
+  worker:
+    build:
+      context: .
+      target: development
+    container_name: careflow_worker
+    env_file: .env.docker
+    depends_on:
+      - redis
+      - maildev
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
+      - ./package-lock.json:/usr/src/app/package-lock.json
+    command: npm run worker
+    networks:
+      - careflow_network
+    restart: unless-stopped
+
+  # MongoDB Database
+  mongo:
+    image: mongo:6.0
+    container_name: careflow_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - careflow_network
+    restart: unless-stopped
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Redis (Queue & Cache)
+  redis:
+    image: redis:7-alpine
+    container_name: careflow_redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    networks:
+      - careflow_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MailDev (Email Testing)
+  maildev:
+    image: maildev/maildev
+    container_name: careflow_maildev
+    ports:
+      - "1080:1080" # Web UI
+      - "1025:1025" # SMTP
+    networks:
+      - careflow_network
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+  redis-data:
+
+networks:
+  careflow_network:
+    driver: bridge
