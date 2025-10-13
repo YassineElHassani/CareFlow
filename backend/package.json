@@ -7,6 +7,7 @@
   "license": "ISC",
   "scripts": {
     "dev": "nodemon --watch src --inspect=0 src/index.js",
+    "dev:clean": "bash scripts/start-dev.sh",
     "start": "node src/index.js",
     "worker": "node src/queues/WorkerEmail.js",
     "test": "NODE_ENV=test mocha --recursive --exit src/tests/**/*.test.js",
@@ -40,6 +41,8 @@
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.0",
     "redlock": "^4.2.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "winston": "^3.8.0"
   },
   "devDependencies": {
@@ -64,4 +67,3 @@
     "all": true
   }
 }
-
