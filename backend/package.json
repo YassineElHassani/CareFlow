@@ -1,0 +1,67 @@
+{
+  "name": "careflow-ehr-backend",
+  "version": "1.0.0",
+  "description": "CareFlow EHR - Electronic Health Record backend API",
+  "main": "src/index.js",
+  "author": "Yassine El Hassani",
+  "license": "ISC",
+  "scripts": {
+    "dev": "nodemon --watch src --inspect=0 src/index.js",
+    "start": "node src/index.js",
+    "worker": "node src/queues/WorkerEmail.js",
+    "test": "NODE_ENV=test mocha --recursive --exit src/tests/**/*.test.js",
+    "test:unit": "NODE_ENV=test mocha --recursive --exit src/tests/unit/**/*.test.js",
+    "test:integration": "NODE_ENV=test mocha --recursive --exit src/tests/integration/**/*.test.js",
+    "test:watch": "NODE_ENV=test mocha --recursive --watch src/tests/**/*.test.js",
+    "test:coverage": "NODE_ENV=test nyc mocha --recursive --exit src/tests/**/*.test.js",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YassineElHassani/CareFlow.git"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "bullmq": "^5.61.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^6.0.0",
+    "ioredis": "^5.8.1",
+    "joi": "^17.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.0",
+    "morgan": "^1.10.0",
+    "nodemailer": "^6.9.0",
+    "redlock": "^4.2.0",
+    "winston": "^3.8.0"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "^8.0.0",
+    "mocha": "^10.0.0",
+    "mongodb-memory-server": "^8.12.0",
+    "nodemon": "^2.0.0",
+    "nyc": "^15.1.0",
+    "supertest": "^6.3.3"
+  },
+  "nyc": {
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "exclude": [
+      "src/tests/**",
+      "node_modules/**"
+    ],
+    "all": true
+  }
+}
+
