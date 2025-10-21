@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema({
   role: {
     type: String,
     enum: {
-      values: ['admin', 'doctor', 'nurse', 'secretary', 'patient'],
+      values: ['admin', 'doctor', 'nurse', 'secretary', 'patient', 'pharmacist', 'lab-technician'],
       message: '{VALUE} is not a valid role',
     },
     default: 'patient',
@@ -77,11 +77,39 @@ const UserSchema = new mongoose.Schema({
   },
 
   professional: {
+    // Doctor-specific fields
     licenseNumber: { type: String, sparse: true },
     specialization: [{ type: String }],
     department: { type: String },
     qualifications: [{ type: String }],
     yearsOfExperience: { type: Number, min: 0 },
+    
+    // Pharmacist-specific fields
+    pharmacyLicense: {
+      type: String,
+      sparse: true,
+      description: 'Pharmacy license number for pharmacists',
+    },
+    pharmacy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Pharmacy',
+      description: 'Assigned pharmacy for pharmacist',
+    },
+    
+    // Lab Technician-specific fields
+    labLicense: {
+      type: String,
+      sparse: true,
+      description: 'Laboratory license number for lab technicians',
+    },
+    laboratory: {
+      type: String,
+      description: 'Assigned laboratory name',
+    },
+    labSpecialization: {
+      type: String,
+      description: 'Laboratory specialization (e.g., Hematology, Microbiology)',
+    },
   },
 
   lastLogin: { type: Date },
