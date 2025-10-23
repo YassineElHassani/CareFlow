@@ -2,10 +2,6 @@ const PharmacyService = require('../services/PharmacyService');
 const ApiError = require('../utils/ApiError');
 
 class PharmacyController {
-  /**
-   * Create pharmacy (admin only)
-   * POST /api/v1/pharmacies
-   */
   async createPharmacy(req, res, next) {
     try {
       const pharmacy = await PharmacyService.createPharmacy(req.body, req.user._id);
@@ -20,10 +16,6 @@ class PharmacyController {
     }
   }
 
-  /**
-   * Get pharmacy by ID
-   * GET /api/v1/pharmacies/:id
-   */
   async getPharmacyById(req, res, next) {
     try {
       const pharmacy = await PharmacyService.getPharmacyById(req.params.id);
@@ -37,10 +29,6 @@ class PharmacyController {
     }
   }
 
-  /**
-   * Get all pharmacies
-   * GET /api/v1/pharmacies
-   */
   async getAllPharmacies(req, res, next) {
     try {
       const filters = {
@@ -67,10 +55,6 @@ class PharmacyController {
     }
   }
 
-  /**
-   * Update pharmacy (admin only)
-   * PUT /api/v1/pharmacies/:id
-   */
   async updatePharmacy(req, res, next) {
     try {
       const pharmacy = await PharmacyService.updatePharmacy(
@@ -89,10 +73,6 @@ class PharmacyController {
     }
   }
 
-  /**
-   * Delete pharmacy (admin only)
-   * DELETE /api/v1/pharmacies/:id
-   */
   async deletePharmacy(req, res, next) {
     try {
       const result = await PharmacyService.deletePharmacy(req.params.id);
@@ -106,10 +86,6 @@ class PharmacyController {
     }
   }
 
-  /**
-   * Get prescriptions for pharmacy (pharmacist view)
-   * GET /api/v1/pharmacies/:id/prescriptions
-   */
   async getPharmacyPrescriptions(req, res, next) {
     try {
       const filters = {
@@ -139,10 +115,6 @@ class PharmacyController {
     }
   }
 
-  /**
-   * Dispense medication (pharmacist only)
-   * POST /api/v1/pharmacies/prescriptions/:prescriptionId/dispense
-   */
   async dispenseMedication(req, res, next) {
     try {
       const { medicationIndex, dispensedQuantity } = req.body;
@@ -172,10 +144,6 @@ class PharmacyController {
     }
   }
 
-  /**
-   * Mark medication as unavailable (pharmacist only)
-   * POST /api/v1/pharmacies/prescriptions/:prescriptionId/mark-unavailable
-   */
   async markMedicationUnavailable(req, res, next) {
     try {
       const { medicationIndex, reason } = req.body;
