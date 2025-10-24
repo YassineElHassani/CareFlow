@@ -2,10 +2,6 @@ const LabOrderService = require('../services/LabOrderService');
 const ApiError = require('../utils/ApiError');
 
 class LabOrdersController {
-  /**
-   * Create lab order (doctor only)
-   * POST /api/v1/lab-orders
-   */
   async createLabOrder(req, res, next) {
     try {
       const labOrder = await LabOrderService.createLabOrder(req.body, req.user._id);
@@ -20,10 +16,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Get lab order by ID
-   * GET /api/v1/lab-orders/:id
-   */
   async getLabOrderById(req, res, next) {
     try {
       const labOrder = await LabOrderService.getLabOrderById(req.params.id);
@@ -37,10 +29,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Get all lab orders (with filters)
-   * GET /api/v1/lab-orders
-   */
   async getAllLabOrders(req, res, next) {
     try {
       const filters = {
@@ -71,10 +59,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Update specimen collection
-   * POST /api/v1/lab-orders/:id/specimen-collection
-   */
   async updateSpecimenCollection(req, res, next) {
     try {
       const labOrder = await LabOrderService.updateSpecimenCollection(
@@ -93,10 +77,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Upload test result (lab technician only)
-   * POST /api/v1/lab-orders/:id/tests/:testIndex/result
-   */
   async uploadTestResult(req, res, next) {
     try {
       const testIndex = parseInt(req.params.testIndex);
@@ -122,10 +102,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Update test status
-   * PUT /api/v1/lab-orders/:id/tests/:testIndex/status
-   */
   async updateTestStatus(req, res, next) {
     try {
       const testIndex = parseInt(req.params.testIndex);
@@ -157,10 +133,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Finalize lab report
-   * POST /api/v1/lab-orders/:id/finalize-report
-   */
   async finalizeLabReport(req, res, next) {
     try {
       const labOrder = await LabOrderService.finalizeLabReport(
@@ -179,10 +151,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Cancel lab order
-   * POST /api/v1/lab-orders/:id/cancel
-   */
   async cancelLabOrder(req, res, next) {
     try {
       const { reason } = req.body;
@@ -207,10 +175,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Get lab orders for patient
-   * GET /api/v1/lab-orders/patient/:patientId
-   */
   async getPatientLabOrders(req, res, next) {
     try {
       // If patient, can only view own lab orders
@@ -242,10 +206,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Get lab orders created by doctor
-   * GET /api/v1/lab-orders/doctor/:doctorId
-   */
   async getDoctorLabOrders(req, res, next) {
     try {
       // If doctor, can only view own lab orders
@@ -277,10 +237,6 @@ class LabOrdersController {
     }
   }
 
-  /**
-   * Get lab technician dashboard
-   * GET /api/v1/lab-orders/dashboard/technician
-   */
   async getLabTechnicianDashboard(req, res, next) {
     try {
       const filters = {
