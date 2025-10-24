@@ -8,12 +8,18 @@ const userRoutes = require('./v1/UserRoutes');
 const patientRoutes = require('./v1/PatientRoutes');
 const appointmentRoutes = require('./v1/AppointmentRoutes');
 const doctorRoutes = require('./v1/DoctorRoutes');
+const prescriptionRoutes = require('./v1/PrescriptionRoutes');
+const pharmacyRoutes = require('./v1/PharmacyRoutes');
+const labOrderRoutes = require('./v1/LabOrderRoutes');
 
 // Mount routes with prefixes
 router.use('/users', userRoutes);
 router.use('/patients', patientRoutes);
 router.use('/appointments', appointmentRoutes);
 router.use('/doctors', doctorRoutes);
+router.use('/prescriptions', prescriptionRoutes);
+router.use('/pharmacies', pharmacyRoutes);
+router.use('/lab-orders', labOrderRoutes);
 
 /**
  * @swagger

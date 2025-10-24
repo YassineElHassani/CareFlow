@@ -62,7 +62,7 @@ const AppointmentSchema = new mongoose.Schema({
       'completed',
       'cancelled',
       'no_show',
-      'rescheduled',
+      ' ',
     ],
     default: 'scheduled',
   },
