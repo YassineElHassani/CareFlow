@@ -34,10 +34,22 @@ Patient demographic and medical information
 ### 3. **Appointments** (Scheduling)
 Patient visits and consultations
 
-### 4. **Medical Records** (Clinical Data)
-Diagnoses, treatments, prescriptions
+### 4. **Consultations** (Clinical Documentation)
+SOAP notes and clinical findings
 
-### 5. **Audit Logs** (Compliance)
+### 5. **Prescriptions** (Medication Orders)
+Digital prescriptions with medications
+
+### 6. **Pharmacies** (Partner Network)
+Pharmacy directory and operations
+
+### 7. **Lab Orders** (Laboratory Tests)
+Test orders and results
+
+### 8. **Medical Records** (Clinical Data)
+Diagnoses, treatments, documents
+
+### 9. **Audit Logs** (Compliance)
 Track all sensitive data access
 
 ---
@@ -58,7 +70,7 @@ Track all sensitive data access
   refreshToken: String (JWT refresh token, never returned),
   
   // Authorization
-  role: Enum ['admin', 'doctor', 'nurse', 'secretary', 'lab_tech'],
+  role: Enum ['admin', 'doctor', 'nurse', 'secretary', 'patient', 'pharmacist', 'lab-technician'], 🆕
   permissions: [String], // ['read:patients', 'write:prescriptions']
   isActive: Boolean,
   isEmailVerified: Boolean,
@@ -81,13 +93,22 @@ Track all sensitive data access
     }
   },
   
-  // Professional Info (for doctors/nurses)
+  // Professional Info (for doctors/nurses/pharmacists/lab-techs)
   professional: {
     licenseNumber: String,
     specialization: [String], // ['Cardiology', 'Pediatrics']
     department: String,
     qualifications: [String],
-    yearsOfExperience: Number
+    yearsOfExperience: Number,
+    
+    // Pharmacist-specific fields
+    pharmacyLicense: String,
+    pharmacy: ObjectId (ref: Pharmacy),
+    
+    // Lab Technician-specific fields
+    labLicense: String,
+    laboratory: String,
+    labSpecialization: String
   },
   
   // System
@@ -577,9 +598,298 @@ Appointment.find({
 3. **Validate at schema level** (required, enums, min/max)
 4. **Use virtuals** for computed fields (fullName, age)
 5. **Pre/post hooks** for business logic (send email after appointment)
-6. **Lean queries** when you don't need Mongoose documents
-7. **Projection** - only select fields you need
-8. **Populate wisely** - avoid deep population
+7. **Lean queries** when you don't need Mongoose documents
+8. **Projection** - only select fields you need
+9. **Populate wisely** - avoid deep population
+
+---
+
+## New Schema Models (Phase 2 & 3) 🆕
+
+### Prescriptions Collection
+
+**Purpose:** Digital prescription management with medication tracking
+
+```javascript
+{
+  _id: ObjectId,
+  
+  // Auto-generated number
+  prescriptionNumber: String (unique, "RX-2025-00001"),
+  
+  // Relationships
+  patient: ObjectId (ref: Patient, required),
+  doctor: ObjectId (ref: User, required),
+  consultation: ObjectId (ref: Consultation),
+  pharmacy: ObjectId (ref: Pharmacy),
+  
+  // Medications (array of subdocuments)
+  medications: [{
+    name: String (required),
+    genericName: String,
+    dosage: String (required), // "500mg"
+    route: Enum ['oral', 'IV', 'IM', 'SC', 'topical', 'inhalation', 
+                 'rectal', 'vaginal', 'sublingual', 'transdermal', 
+                 'ophthalmic', 'otic'],
+    frequency: String (required), // "twice daily"
+    duration: String (required), // "7 days"
+    quantity: Number (required),
+    refills: Number (default: 0),
+    instructions: String,
+    
+    // Dispensing tracking
+    isDispensed: Boolean (default: false),
+    dispensedAt: Date,
+    dispensedQuantity: Number
+  }],
+  
+  // Status workflow
+  status: Enum ['draft', 'signed', 'sent', 'partially-dispensed', 
+                'dispensed', 'cancelled', 'expired'],
+  
+  // Digital signature
+  signedAt: Date,
+  signedBy: ObjectId (ref: User),
+  digitalSignature: String, // SHA256 hash
+  
+  // Pharmacy tracking
+  sentToPharmacyAt: Date,
+  dispensedAt: Date,
+  dispensedBy: ObjectId (ref: User),
+  
+  // Expiry and renewal
+  expiresAt: Date (default: +30 days),
+  isRenewal: Boolean (default: false),
+  originalPrescription: ObjectId (ref: Prescription),
+  
+  // Cancellation
+  cancelledAt: Date,
+  cancellationReason: String,
+  
+  // Notes
+  notes: String,
+  
+  // Audit
+  createdBy: ObjectId (ref: User),
+  lastModifiedBy: ObjectId (ref: User),
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes:**
+- `prescriptionNumber` (unique)
+- `patient + createdAt`
+- `doctor + createdAt`
+- `pharmacy + status`
+- `status + expiresAt`
+
+**Virtuals:**
+- `isExpired` - Check if past expiry date
+- `dispensingProgress` - Percentage of medications dispensed
+- `totalMedications` - Count of medications
+
+---
+
+### Pharmacies Collection
+
+**Purpose:** Partner pharmacy directory and management
+
+```javascript
+{
+  _id: ObjectId,
+  
+  // Auto-generated number
+  pharmacyNumber: String (unique, "PH-2025-00001"),
+  
+  // Basic info
+  name: String (required),
+  licenseNumber: String (required, unique),
+  
+  // Contact
+  contact: {
+    phone: String (required),
+    email: String,
+    fax: String,
+    website: String
+  },
+  
+  // Address with geolocation
+  address: {
+    street: String (required),
+    city: String (required),
+    state: String,
+    postalCode: String,
+    country: String (default: 'USA'),
+    coordinates: {
+      latitude: Number,
+      longitude: Number
+    }
+  },
+  
+  // Operating hours (array of subdocuments)
+  operatingHours: [{
+    day: Enum ['monday', 'tuesday', 'wednesday', 'thursday', 
+               'friday', 'saturday', 'sunday'],
+    open: String, // "09:00"
+    close: String, // "21:00"
+    isClosed: Boolean (default: false)
+  }],
+  
+  // 24-hour pharmacy indicator
+  is24Hours: Boolean (default: false),
+  
+  // Pharmacist info
+  pharmacist: {
+    name: String,
+    license: String,
+    contact: String
+  },
+  
+  // Services offered
+  services: [Enum ['prescription-dispensing', 'delivery', 'consultation',
+                   'vaccination', 'blood-pressure-monitoring', 
+                   'diabetes-care', 'compounding']],
+  
+  // Inventory (array of subdocuments)
+  inventory: [{
+    medicationName: String,
+    genericName: String,
+    quantity: Number,
+    unit: String,
+    expiryDate: Date,
+    lastRestocked: Date
+  }],
+  
+  // Assigned users (pharmacists)
+  assignedUsers: [ObjectId (ref: User)],
+  
+  // Status
+  isActive: Boolean (default: true),
+  
+  // Audit
+  createdBy: ObjectId (ref: User),
+  lastModifiedBy: ObjectId (ref: User),
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes:**
+- `pharmacyNumber` (unique)
+- `name` (text search)
+- `licenseNumber` (unique)
+- `address.city + isActive`
+
+**Methods:**
+- `isOpenAt(datetime)` - Check if pharmacy is open at specific time
+
+**Virtuals:**
+- `fullAddress` - Formatted complete address string
+
+---
+
+### Lab Orders Collection
+
+**Purpose:** Laboratory test orders and results management
+
+```javascript
+{
+  _id: ObjectId,
+  
+  // Auto-generated number
+  labOrderNumber: String (unique, "LAB-2025-00001"),
+  
+  // Relationships
+  patient: ObjectId (ref: Patient, required),
+  doctor: ObjectId (ref: User, required),
+  consultation: ObjectId (ref: Consultation),
+  
+  // Tests (array of subdocuments)
+  tests: [{
+    code: String, // "CBC", "HGB", etc.
+    name: String (required),
+    category: Enum ['hematology', 'biochemistry', 'microbiology', 
+                   'immunology', 'serology', 'urinalysis', 
+                   'pathology', 'radiology', 'genetics'],
+    priority: Enum ['routine', 'urgent', 'stat'],
+    
+    // Test status
+    status: Enum ['ordered', 'specimen-collected', 'in-progress', 
+                 'completed', 'cancelled'],
+    orderedAt: Date,
+    startedAt: Date,
+    completedAt: Date,
+    
+    // Results
+    result: {
+      value: Mixed, // String, Number, Boolean
+      unit: String,
+      referenceRange: String, // "70-100 mg/dL"
+      flag: Enum ['normal', 'low', 'high', 'critical'],
+      performedAt: Date,
+      performedBy: ObjectId (ref: User),
+      reviewedAt: Date,
+      reviewedBy: ObjectId (ref: User),
+      interpretation: String
+    }
+  }],
+  
+  // Laboratory info
+  laboratory: {
+    name: String (required),
+    address: String,
+    phone: String,
+    email: String
+  },
+  
+  // Clinical info
+  clinicalInfo: String, // Doctor's notes/indication
+  
+  // Specimen tracking
+  specimenCollectedAt: Date,
+  specimenCollectedBy: ObjectId (ref: User),
+  receivedByLabAt: Date,
+  
+  // Overall status
+  status: Enum ['ordered', 'specimen-collected', 'in-progress', 
+               'partially-completed', 'completed', 'cancelled'],
+  
+  // Report
+  report: {
+    documentId: ObjectId (ref: Document),
+    summary: String,
+    generalComments: String,
+    pathologistSignature: String,
+    reportedAt: Date
+  },
+  
+  // Cancellation
+  cancelledAt: Date,
+  cancellationReason: String,
+  
+  // Audit
+  createdBy: ObjectId (ref: User),
+  lastModifiedBy: ObjectId (ref: User),
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes:**
+- `labOrderNumber` (unique)
+- `patient + createdAt`
+- `doctor + createdAt`
+- `status + priority`
+- `laboratory.name`
+
+**Pre-save Hook:**
+- Auto-update overall status based on individual test statuses
+
+**Virtuals:**
+- `completionProgress` - Percentage of tests completed
+- `hasCriticalResults` - Boolean if any test has critical flag
+- `abnormalResultsCount` - Count of non-normal results
 
 ---
 
