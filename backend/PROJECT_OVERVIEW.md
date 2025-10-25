@@ -17,7 +17,7 @@
 
 ## Project Summary
 
-CareFlow is a modern, scalable backend API for electronic health records management, designed for clinics and medical practices. Built with Node.js, Express, MongoDB, and Redis, it provides comprehensive user management, patient records, appointment scheduling with automatic conflict detection, and email notifications.
+CareFlow is a modern, scalable backend API for electronic health records management, designed for clinics and medical practices. Built with Node.js, Express, MongoDB, Redis, and MinIO, it provides comprehensive user management, patient records, appointment scheduling with automatic conflict detection, clinical consultations, digital prescriptions, pharmacy integration, laboratory test management, and email notifications.
 
 ---
 
@@ -75,10 +75,13 @@ CareFlow is a modern, scalable backend API for electronic health records managem
   - Nurse
   - Patient
   - Secretary
+  - **Pharmacist**
+  - **Lab Technician**
 - **Profile Management**
 - **Account Suspension/Activation**
 - **Password Reset via Email**
 - **Professional credentials tracking**
+- **Pharmacy and laboratory license management**
 
 ### 2. Patient Management
 - **Complete Patient Records**
@@ -98,6 +101,149 @@ CareFlow is a modern, scalable backend API for electronic health records managem
 - **Smart Scheduling**
   - **Real-time conflict detection** (HTTP 409)
   - Auto-generated appointment numbers (APT-2025-00001)
+  - 30-minute time slots (9 AM - 5 PM)
+- **Appointment Lifecycle**
+  - Multiple statuses: scheduled, in-progress, completed, cancelled, no-show
+  - Modification and cancellation
+  - Doctor assignment
+- **Availability Management**
+  - Real-time availability checking
+  - Doctor schedule view with booked slots
+  - Patient appointment history
+- **Automated Notifications**
+  - Email reminders 24 hours before appointment
+  - Cancellation notifications
+
+**Tested:** Create, List, Get by ID, Doctor Availability, Conflict Detection
+
+### 4. Consultation Management
+- **Clinical Documentation**
+  - SOAP note format (Subjective, Objective, Assessment, Plan)
+  - Vital signs recording (BP, temp, heart rate, respiratory rate, O2 saturation, weight, height)
+  - Chief complaint and present illness
+  - Physical examination findings
+- **Diagnosis & Treatment**
+  - ICD-10 diagnosis codes
+  - Treatment plan documentation
+  - Follow-up scheduling
+- **Linked to Appointments**
+  - One consultation per appointment
+  - Auto-populated doctor and patient
+- **Search & Filtering**
+  - By patient, doctor, date range, diagnosis
+
+### 5. Prescription Management
+- **Digital Prescriptions**
+  - Medication details (name, generic name, dosage, quantity)
+  - 12 medication routes (oral, IV, IM, SC, topical, inhalation, rectal, vaginal, sublingual, transdermal, ophthalmic, otic)
+  - Frequency, duration, and special instructions
+  - Refill tracking
+- **Prescription Workflow**
+  - Draft → Signed → Sent to Pharmacy → Partially Dispensed → Dispensed
+  - Digital signature with SHA256 hashing
+  - Doctor authorization required
+- **Auto-numbering**: RX-2025-00001
+- **Prescription Features**
+  - Automatic 30-day expiry
+  - Renewal capability (creates new prescription)
+  - Link to consultations
+  - Cancellation with reason tracking
+- **Views**
+  - Patient prescription history
+  - Doctor prescribed medications
+  - Pharmacy pending prescriptions
+
+### 6. Pharmacy Management
+- **Pharmacy Directory**
+  - Auto-generated pharmacy numbers (PH-2025-00001)
+  - Contact information and address with geolocation
+  - License number tracking
+  - Operating hours management
+  - 24-hour pharmacy indicator
+- **Services Offered**
+  - Prescription dispensing
+  - Home delivery
+  - Pharmacist consultation
+  - Vaccination services
+  - Blood pressure monitoring
+  - Diabetes care
+  - Medication compounding
+- **Inventory Management**
+  - Medication stock tracking
+  - Expiry date monitoring
+  - Last restocked timestamp
+- **Pharmacist Operations**
+  - View assigned prescriptions
+  - Dispense medications (individual tracking)
+  - Mark medications as unavailable
+  - Update inventory levels
+- **Public Features**
+  - Search pharmacies by city
+  - Filter by 24-hour availability
+  - Check operating hours in real-time
+
+### 7. Laboratory Integration
+- **Lab Order Management**
+  - Auto-generated lab order numbers (LAB-2025-00001)
+  - Link to consultations
+  - Multiple tests per order
+- **Test Categories**
+  - Hematology (CBC, differential, etc.)
+  - Biochemistry (glucose, lipids, etc.)
+  - Microbiology (cultures, sensitivity)
+  - Immunology (antibodies, antigens)
+  - Serology (viral markers)
+  - Urinalysis
+  - Pathology (biopsies, cytology)
+  - Radiology (X-ray, CT, MRI)
+  - Genetics (DNA testing)
+- **Priority Levels**
+  - Routine
+  - Urgent
+  - STAT (immediate)
+- **Specimen Tracking**
+  - Collection date/time and collector
+  - Received by lab timestamp
+- **Results Management**
+  - Individual test result uploads
+  - Reference ranges
+  - Flags: normal, low, high, **critical**
+  - Result interpretation notes
+  - Performed by and reviewed by tracking
+- **Lab Report**
+  - Overall summary
+  - General comments
+  - Pathologist digital signature
+  - Report completion date
+- **Status Workflow**
+  - Ordered → Specimen Collected → In Progress → Partially Completed → Completed
+  - Cancellation with reason
+- **Lab Technician Dashboard**
+  - Pending tests count
+  - In-progress tests count
+  - Urgent/STAT priority alerts
+  - Filter by laboratory and category
+- **Progress Tracking**
+  - Completion percentage
+  - Critical results indicator
+  - Abnormal results count
+
+### 8. Document Management
+- **MinIO S3-Compatible Storage**
+  - Self-hosted object storage
+  - Three dedicated buckets:
+    - `careflow-documents` - General medical documents
+    - `careflow-lab-reports` - Laboratory PDF reports
+    - `careflow-prescriptions` - Prescription documents
+- **File Operations**
+  - Secure file upload
+  - Pre-signed URL generation
+  - File metadata retrieval
+  - Document deletion
+- **Integration**
+  - Link documents to lab orders
+  - Store prescription PDFs
+  - Medical record attachments
   - Practitioner availability checking (30-min slots, 9 AM - 5 PM)
   - Multiple status support
 - **Email Reminders** (24h before)
@@ -248,6 +394,73 @@ GET    /patients/search   Search patients
 ```
 GET    /appointments              List appointments
 GET    /appointments/:id          Get appointment
+POST   /appointments              Create appointment
+PUT    /appointments/:id          Update appointment
+DELETE /appointments/:id          Delete appointment
+PATCH  /appointments/:id/cancel   Cancel appointment
+GET    /appointments/patient/:id  Patient appointments
+GET    /appointments/doctor/:id   Doctor appointments
+```
+
+### Doctors (`/api/v1/doctors`)
+```
+GET    /doctors                   List doctors
+GET    /doctors/:id               Get doctor details
+GET    /doctors/:id/availability  Check doctor availability
+POST   /doctors/search            Search doctors
+```
+
+### Consultations (`/api/v1/consultations`)
+```
+POST   /consultations             Create consultation (Doctor)
+GET    /consultations             List consultations
+GET    /consultations/:id         Get consultation details
+PUT    /consultations/:id         Update consultation (Doctor)
+DELETE /consultations/:id         Delete consultation (Doctor)
+GET    /consultations/patient/:id Patient consultations
+GET    /consultations/doctor/:id  Doctor consultations
+```
+
+### Prescriptions (`/api/v1/prescriptions`)
+```
+POST   /prescriptions                      Create prescription (Doctor)
+GET    /prescriptions                      List prescriptions
+GET    /prescriptions/:id                  Get prescription details
+PUT    /prescriptions/:id                  Update draft prescription (Doctor)
+POST   /prescriptions/:id/sign             Sign prescription (Doctor)
+POST   /prescriptions/:id/send-to-pharmacy Send to pharmacy (Doctor)
+POST   /prescriptions/:id/cancel           Cancel prescription (Doctor)
+POST   /prescriptions/:id/renew            Renew prescription (Doctor)
+GET    /prescriptions/patient/:patientId   Patient prescriptions
+GET    /prescriptions/doctor/:doctorId     Doctor prescriptions
+```
+
+### Pharmacies (`/api/v1/pharmacies`)
+```
+POST   /pharmacies                                 Create pharmacy (Admin)
+GET    /pharmacies                                 List pharmacies (Public)
+GET    /pharmacies/:id                             Get pharmacy details
+PUT    /pharmacies/:id                             Update pharmacy (Admin)
+DELETE /pharmacies/:id                             Delete pharmacy (Admin)
+GET    /pharmacies/:id/prescriptions               Pharmacy prescriptions (Pharmacist)
+POST   /pharmacies/prescriptions/:id/dispense      Dispense medication (Pharmacist)
+POST   /pharmacies/prescriptions/:id/mark-unavailable  Mark unavailable (Pharmacist)
+```
+
+### Lab Orders (`/api/v1/lab-orders`)
+```
+POST   /lab-orders                          Create lab order (Doctor)
+GET    /lab-orders                          List lab orders
+GET    /lab-orders/:id                      Get lab order details
+POST   /lab-orders/:id/specimen-collection  Update specimen info (Nurse/Lab Tech)
+POST   /lab-orders/:id/tests/:index/result  Upload test result (Lab Tech)
+PUT    /lab-orders/:id/tests/:index/status  Update test status (Lab Tech)
+POST   /lab-orders/:id/finalize-report      Finalize lab report (Lab Tech)
+POST   /lab-orders/:id/cancel               Cancel lab order (Doctor)
+GET    /lab-orders/patient/:patientId       Patient lab orders
+GET    /lab-orders/doctor/:doctorId         Doctor lab orders
+GET    /lab-orders/dashboard/technician     Lab tech dashboard
+```
 POST   /appointments              Create appointment
 PUT    /appointments/:id          Update appointment
 DELETE /appointments/:id          Cancel appointment
