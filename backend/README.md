@@ -42,12 +42,13 @@ CareFlow is a comprehensive Electronic Health Record (EHR) backend system design
 
 ### User Management
 - Secure registration and login (JWT with access + refresh tokens)
-- Role-based access control (Admin, Doctor, Nurse, Patient, Secretary)
+- Role-based access control (Admin, Doctor, Nurse, Patient, Secretary, **Pharmacist, Lab Technician**)
 - Customizable user profiles
 - Account suspension/reactivation (Admin only)
 - Password reset via email
 - Profile picture upload support
 - Professional credentials management
+- Pharmacy and laboratory license tracking
 
 ### Patient Management
 - Complete patient records (CRUD operations)
@@ -71,6 +72,60 @@ CareFlow is a comprehensive Electronic Health Record (EHR) backend system design
 - Doctor schedule management
 - Automatic email reminders (24 hours before)
 - Cancellation email notifications
+
+### Consultation Management
+- Doctor consultations linked to appointments
+- SOAP note format (Subjective, Objective, Assessment, Plan)
+- Vital signs recording (blood pressure, temperature, heart rate, etc.)
+- Diagnosis and treatment plan documentation
+- Follow-up scheduling
+- Consultation search and filtering
+
+### Prescription Management
+- Digital prescription creation with medication details
+- **Auto-generated prescription numbers (RX-2025-00001)**
+- 12 medication routes (oral, IV, IM, SC, topical, etc.)
+- Digital signature with SHA256 hashing
+- Prescription workflow: draft → signed → sent → dispensed
+- Pharmacy assignment and prescription tracking
+- Automatic 30-day expiry
+- Prescription renewal capability
+- Medication refill tracking
+- Patient and doctor prescription views
+
+### Pharmacy Management
+- **Partner pharmacy directory**
+- Operating hours management with time-based availability check
+- Inventory tracking with expiry dates
+- **Auto-generated pharmacy numbers (PH-2025-00001)**
+- Services: dispensing, delivery, consultation, vaccination, etc.
+- Pharmacist assignment to pharmacies
+- Medication dispensing workflow
+- Mark medications as unavailable with notifications
+- Public pharmacy search (city, 24-hour, services)
+
+### Laboratory Integration
+- Lab test order creation linked to consultations
+- **Auto-generated lab order numbers (LAB-2025-00001)**
+- Test categories: hematology, biochemistry, microbiology, immunology, etc.
+- Priority levels: routine, urgent, stat
+- Specimen collection tracking
+- Individual test result uploads with reference ranges
+- **Critical result flagging (normal, low, high, critical)**
+- Lab report finalization with pathologist signature
+- Lab technician dashboard with pending tests
+- Completion progress tracking
+- Patient and doctor lab result views
+
+### Document Management
+- **MinIO S3-compatible object storage**
+- Three dedicated buckets:
+  - `careflow-documents` - General medical documents
+  - `careflow-lab-reports` - Laboratory reports and results
+  - `careflow-prescriptions` - Prescription documents
+- Secure file upload and retrieval
+- Document metadata tracking
+- Pre-signed URL generation for secure access
 
 ### Doctor Management
 - Doctor listing with specialization filters
@@ -96,6 +151,7 @@ CareFlow is a comprehensive Electronic Health Record (EHR) backend system design
 | **Framework** | Express.js |
 | **Database** | MongoDB (Mongoose ODM) |
 | **Cache/Queue** | Redis + BullMQ |
+| **Storage** | MinIO (S3-compatible) |
 | **Authentication** | JWT + bcryptjs |
 | **Validation** | Joi |
 | **Logging** | Winston + Morgan |
@@ -111,6 +167,8 @@ backend/
 │   ├── config/              # Configuration files
 │   │   ├── database.js      # MongoDB connection
 │   │   ├── redis.js         # Redis connection
+│   │   ├── minio.js         # MinIO S3 storage
+│   │   ├── swagger.js       # Swagger/OpenAPI setup
 │   │   └── logger.js        # Winston logger setup
 │   │
 │   ├── controllers/         # Request handlers
@@ -118,21 +176,33 @@ backend/
 │   │   ├── UsersController.js
 │   │   ├── PatientsController.js
 │   │   ├── DoctorsController.js
-│   │   └── AppointmentsController.js
+│   │   ├── AppointmentsController.js
+│   │   ├── ConsultationsController.js
+│   │   ├── PrescriptionsController.js
+│   │   ├── PharmacyController.js
+│   │   └── LabOrdersController.js
 │   │
 │   ├── models/              # Mongoose schemas
 │   │   ├── UserModel.js
 │   │   ├── PatientModel.js
 │   │   ├── AppointmentModel.js
+│   │   ├── ConsultationModel.js
+│   │   ├── PrescriptionModel.js
+│   │   ├── PharmacyModel.js
+│   │   ├── LabOrderModel.js
 │   │   ├── AuditLogModel.js
-│   │   ├── index.js
-|   |   └── MedicalRecordModel.js
+│   │   ├── MedicalRecordModel.js
+│   │   └── index.js
 │   │
 │   ├── services/            # Business logic
 │   │   ├── AuthService.js
 │   │   ├── PatientService.js
 │   │   ├── UserService.js
-│   │   └── AppointmentService.js
+│   │   ├── AppointmentService.js
+│   │   ├── ConsultationService.js
+│   │   ├── PrescriptionService.js
+│   │   ├── PharmacyService.js
+│   │   └── LabOrderService.js
 │   │
 │   ├── middlewares/         # Express middlewares
 │   │   ├── AuthMiddleware.js
@@ -143,9 +213,13 @@ backend/
 │   │   ├── index.js 
 │   │   └── v1/
 │   │       ├── AppointmentRoutes.js
+│   │       ├── ConsultationRoutes.js
 │   │       ├── DoctorRoutes.js
 │   │       ├── MedicalRecordRoutes.js
 │   │       ├── PatientRoutes.js
+│   │       ├── PrescriptionRoutes.js
+│   │       ├── PharmacyRoutes.js
+│   │       ├── LabOrderRoutes.js
 │   │       └── UserRoutes.js
 │   │
 │   ├── queues/              # Background jobs
@@ -154,7 +228,11 @@ backend/
 │   │
 │   ├── utils/               # Utility functions
 │   │   ├── jwt.js
+│   │   ├── ApiError.js
 │   │   └── DateHelpers.js
+│   │
+│   ├── scripts/             # Database scripts
+│   │   └── seedUsers.js     # Seed test users
 │   │
 │   ├── tests/               # Test files
 │   │   ├── unit/
@@ -164,6 +242,8 @@ backend/
 │   └── index.js             # Entry point
 │
 ├── scripts/                 # Utility scripts
+│   ├── setup.sh
+│   ├── start-dev.sh
 │   └── start-worker.sh
 │
 ├── .env.example             # Environment variables template
