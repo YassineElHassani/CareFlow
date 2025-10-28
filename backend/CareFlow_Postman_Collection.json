@@ -1,13 +1,64 @@
 {
   "info": {
-    "name": "CareFlow EHR API",
-    "description": "Complete API collection for CareFlow Electronic Health Record system",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "name": "CareFlow EHR API - Complete",
+    "description": "Complete API collection for CareFlow Electronic Health Record system with Phase 2 & 3 features (Consultations, Prescriptions, Pharmacies, Lab Orders)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "appointmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "consultationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "prescriptionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pharmacyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "labOrderId",
+      "value": "",
       "type": "string"
     }
   ],
@@ -446,6 +497,758 @@
               "raw": "{{baseUrl}}/appointments",
               "host": ["{{baseUrl}}"],
               "path": ["appointments"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultations",
+      "item": [
+        {
+          "name": "Create Consultation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('consultationId', responseJson.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"appointment\": \"{{appointmentId}}\",\n  \"chiefComplaint\": \"Chest pain and shortness of breath\",\n  \"historyOfPresentIllness\": \"Patient reports intermittent chest pain for the past 3 days, worsening with exertion\",\n  \"vitalSigns\": {\n    \"bloodPressure\": {\n      \"systolic\": 145,\n      \"diastolic\": 90\n    },\n    \"heartRate\": 88,\n    \"temperature\": {\n      \"value\": 37.2,\n      \"unit\": \"celsius\"\n    },\n    \"weight\": {\n      \"value\": 75,\n      \"unit\": \"kg\"\n    },\n    \"height\": {\n      \"value\": 175,\n      \"unit\": \"cm\"\n    },\n    \"oxygenSaturation\": 98\n  },\n  \"assessment\": \"Suspected angina pectoris, rule out acute coronary syndrome\",\n  \"plan\": \"Order ECG, cardiac enzymes. Start aspirin 81mg daily. Follow-up in 1 week or sooner if symptoms worsen.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/consultations",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations"]
+            }
+          }
+        },
+        {
+          "name": "Get Consultation by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}"]
+            }
+          }
+        },
+        {
+          "name": "List All Consultations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Patient Consultations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "patient", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Diagnosis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"I20.0\",\n  \"name\": \"Unstable angina\",\n  \"severity\": \"moderate\",\n  \"notes\": \"Patient requires cardiac workup\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}/diagnosis",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}", "diagnosis"]
+            }
+          }
+        },
+        {
+          "name": "Complete Consultation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}", "complete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prescriptions",
+      "item": [
+        {
+          "name": "Create Prescription",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('prescriptionId', responseJson.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consultation\": \"{{consultationId}}\",\n  \"patient\": \"{{patientId}}\",\n  \"medications\": [\n    {\n      \"name\": \"Aspirin\",\n      \"genericName\": \"Acetylsalicylic Acid\",\n      \"dosage\": \"81mg\",\n      \"route\": \"oral\",\n      \"frequency\": \"Once daily\",\n      \"duration\": \"30 days\",\n      \"quantity\": 30,\n      \"refills\": 2,\n      \"instructions\": \"Take with food to avoid stomach upset\"\n    },\n    {\n      \"name\": \"Atorvastatin\",\n      \"genericName\": \"Atorvastatin Calcium\",\n      \"dosage\": \"20mg\",\n      \"route\": \"oral\",\n      \"frequency\": \"Once daily at bedtime\",\n      \"duration\": \"30 days\",\n      \"quantity\": 30,\n      \"refills\": 2,\n      \"instructions\": \"Take at bedtime. Avoid grapefruit juice.\"\n    }\n  ],\n  \"notes\": \"Monitor for muscle pain or weakness. Follow up in 4 weeks for lipid panel.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions"]
+            }
+          }
+        },
+        {
+          "name": "Get Prescription by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "{{prescriptionId}}"]
+            }
+          }
+        },
+        {
+          "name": "List All Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sign Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/sign",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "{{prescriptionId}}", "sign"]
+            }
+          }
+        },
+        {
+          "name": "Send to Pharmacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pharmacyId\": \"{{pharmacyId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/send-to-pharmacy",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "{{prescriptionId}}", "send-to-pharmacy"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "patient", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Renew Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/renew",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "{{prescriptionId}}", "renew"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Prescription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Patient reported adverse reaction\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "{{prescriptionId}}", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pharmacies",
+      "item": [
+        {
+          "name": "Create Pharmacy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('pharmacyId', responseJson.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"CareFlow Pharmacy\",\n  \"licenseNumber\": \"PHARM-2024-001\",\n  \"contact\": {\n    \"phone\": \"+212522123456\",\n    \"email\": \"contact@careflowpharmacy.com\",\n    \"website\": \"https://careflowpharmacy.com\"\n  },\n  \"address\": {\n    \"street\": \"456 Health Avenue\",\n    \"city\": \"Casablanca\",\n    \"state\": \"Casablanca-Settat\",\n    \"postalCode\": \"20000\",\n    \"country\": \"Morocco\"\n  },\n  \"operatingHours\": [\n    {\n      \"day\": \"monday\",\n      \"open\": \"08:00\",\n      \"close\": \"20:00\",\n      \"isClosed\": false\n    },\n    {\n      \"day\": \"tuesday\",\n      \"open\": \"08:00\",\n      \"close\": \"20:00\",\n      \"isClosed\": false\n    },\n    {\n      \"day\": \"wednesday\",\n      \"open\": \"08:00\",\n      \"close\": \"20:00\",\n      \"isClosed\": false\n    },\n    {\n      \"day\": \"thursday\",\n      \"open\": \"08:00\",\n      \"close\": \"20:00\",\n      \"isClosed\": false\n    },\n    {\n      \"day\": \"friday\",\n      \"open\": \"08:00\",\n      \"close\": \"20:00\",\n      \"isClosed\": false\n    },\n    {\n      \"day\": \"saturday\",\n      \"open\": \"09:00\",\n      \"close\": \"18:00\",\n      \"isClosed\": false\n    },\n    {\n      \"day\": \"sunday\",\n      \"open\": \"00:00\",\n      \"close\": \"00:00\",\n      \"isClosed\": true\n    }\n  ],\n  \"servicesOffered\": [\"prescription-dispensing\", \"otc-medications\", \"consultation\", \"home-delivery\"],\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies"]
+            }
+          }
+        },
+        {
+          "name": "List All Pharmacies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pharmacy by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies/{{pharmacyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies", "{{pharmacyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Pharmacies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies?search=CareFlow&city=Casablanca",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "CareFlow"
+                },
+                {
+                  "key": "city",
+                  "value": "Casablanca"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pharmacy Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies/{{pharmacyId}}/prescriptions?status=sent",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies", "{{pharmacyId}}", "prescriptions"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "sent"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dispense Medication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicationIndex\": 0,\n  \"dispensedQuantity\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies/prescriptions/{{prescriptionId}}/dispense",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies", "prescriptions", "{{prescriptionId}}", "dispense"]
+            }
+          }
+        },
+        {
+          "name": "Mark Medication Unavailable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicationIndex\": 1,\n  \"reason\": \"Out of stock, expected restock in 3 days\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies/prescriptions/{{prescriptionId}}/mark-unavailable",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies", "prescriptions", "{{prescriptionId}}", "mark-unavailable"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lab Orders",
+      "item": [
+        {
+          "name": "Create Lab Order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('labOrderId', responseJson.data._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consultationId\": \"{{consultationId}}\",\n  \"patient\": \"{{patientId}}\",\n  \"tests\": [\n    {\n      \"code\": \"CBC\",\n      \"name\": \"Complete Blood Count\",\n      \"category\": \"hematology\",\n      \"priority\": \"routine\",\n      \"specimenType\": \"Blood\"\n    },\n    {\n      \"code\": \"LIPID\",\n      \"name\": \"Lipid Panel\",\n      \"category\": \"biochemistry\",\n      \"priority\": \"routine\",\n      \"specimenType\": \"Blood\"\n    },\n    {\n      \"code\": \"HBA1C\",\n      \"name\": \"Hemoglobin A1c\",\n      \"category\": \"biochemistry\",\n      \"priority\": \"routine\",\n      \"specimenType\": \"Blood\"\n    }\n  ],\n  \"laboratory\": {\n    \"name\": \"CareFlow Medical Laboratory\",\n    \"address\": \"789 Lab Street, Casablanca\",\n    \"phone\": \"+212522789012\"\n  },\n  \"clinicalInfo\": \"Patient with suspected cardiovascular disease. Monitoring lipid levels and glucose control.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Lab Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "{{labOrderId}}"]
+            }
+          }
+        },
+        {
+          "name": "List All Lab Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Specimen Collection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"collectedBy\": \"{{userId}}\",\n  \"collectedAt\": \"2025-10-26T10:30:00Z\",\n  \"notes\": \"Specimen collected without complications\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/specimen-collection",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "{{labOrderId}}", "specimen-collection"]
+            }
+          }
+        },
+        {
+          "name": "Upload Test Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": \"6.8\",\n  \"unit\": \"g/dL\",\n  \"referenceRange\": \"6.0-8.0 g/dL\",\n  \"flag\": \"normal\",\n  \"interpretation\": \"Hemoglobin A1c within normal range\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/tests/2/result",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "{{labOrderId}}", "tests", "2", "result"]
+            }
+          }
+        },
+        {
+          "name": "Update Test Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/tests/2/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "{{labOrderId}}", "tests", "2", "status"]
+            }
+          }
+        },
+        {
+          "name": "Finalize Lab Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportSummary\": \"All test results within normal limits. No critical findings.\",\n  \"recommendations\": \"Continue current treatment. Repeat lipid panel in 6 months.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/finalize-report",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "{{labOrderId}}", "finalize-report"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient Lab Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/patient/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "patient", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Lab Technician Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/dashboard/technician",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "dashboard", "technician"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Lab Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Patient requested cancellation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "{{labOrderId}}", "cancel"]
             }
           }
         }
