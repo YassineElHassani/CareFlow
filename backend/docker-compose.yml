@@ -51,10 +51,12 @@ services:
 
   # MongoDB Database
   mongo:
-    image: mongo:6.0
+    image: mongo:7.0
     container_name: careflow_mongo
     ports:
-      - "27017:27017"
+      # Use an environment variable to allow remapping the host port if 27017 is already in use.
+      # Defaults to 27018 to avoid conflicts on developer machines. Set MONGO_HOST_PORT in .env.docker or env to override.
+      - "${MONGO_HOST_PORT:-27018}:27017"
     volumes:
       - mongo-data:/data/db
     networks:
