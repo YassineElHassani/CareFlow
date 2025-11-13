@@ -50,6 +50,10 @@ const testSchema = new mongoose.Schema({
       ref: 'User',
     },
     interpretation: String,
+    fileUrl: {
+      type: String,
+      description: 'URL to uploaded test result file in MinIO',
+    },
   },
 }, { _id: true });
 
