@@ -2,6 +2,7 @@ const LabOrder = require('../models/LabOrderModel');
 const Consultation = require('../models/ConsultationModel');
 const ApiError = require('../utils/ApiError');
 const logger = require('../config/logger');
+const { uploadFile } = require('../config/minio');
 
 class LabOrderService {
   async createLabOrder(data, doctorId) {
@@ -165,7 +166,7 @@ class LabOrderService {
     }
   }
 
-  async uploadTestResult(labOrderId, testIndex, resultData, technicianId) {
+  async uploadTestResult(labOrderId, testIndex, resultData, technicianId, fileInfo = null) {
     try {
       const labOrder = await LabOrder.findById(labOrderId);
 
@@ -183,6 +184,26 @@ class LabOrderService {
 
       const test = labOrder.tests[testIndex];
 
+      // Handle file upload to MinIO if file is provided
+      let fileUrl = null;
+      if (fileInfo) {
+        const timestamp = Date.now();
+        const fileName = `${labOrder.labOrderNumber}_test_${testIndex}_${timestamp}_${fileInfo.originalName}`;
+        const objectName = `lab-reports/${labOrder.patient}/${fileName}`;
+
+        try {
+          await uploadFile('careflow-lab-reports', objectName, fileInfo.buffer, {
+            'Content-Type': fileInfo.mimeType,
+            'Original-Name': fileInfo.originalName,
+          });
+          fileUrl = `/api/v1/files/lab-reports/${objectName}`;
+          logger.info(`File uploaded to MinIO: ${objectName}`);
+        } catch (uploadError) {
+          logger.error('Error uploading file to MinIO:', uploadError);
+          throw new ApiError(500, 'Failed to upload test result file');
+        }
+      }
+
       test.result = {
         value: resultData.value,
         unit: resultData.unit,
@@ -191,6 +212,7 @@ class LabOrderService {
         performedAt: new Date(),
         performedBy: technicianId,
         interpretation: resultData.interpretation,
+        fileUrl: fileUrl, // Add file URL if file was uploaded
       };
 
       test.status = 'completed';

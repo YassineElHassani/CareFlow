@@ -37,7 +37,7 @@ const register = async (userData) => {
       gender,
       address: address || {},
     },
-    professional: (role === 'doctor' || role === 'nurse') ? professionalInfo : undefined,
+    professional: (role === 'doctor' || role === 'nurse' || role === 'pharmacist' || role === 'lab-technician') ? professionalInfo : undefined,
   });
 
   const tokens = generateTokens(user);
@@ -141,8 +141,14 @@ const requestPasswordReset = async (email) => {
 };
 
 const resetPassword = async (token, newPassword) => {
+  const crypto = require('crypto');
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
   const user = await User.findOne({
-    passwordResetToken: token,
+    passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
 
@@ -160,9 +166,75 @@ const resetPassword = async (token, newPassword) => {
   return { message: 'Password reset successful' };
 };
 
+const refreshToken = async (refreshToken) => {
+  if (!refreshToken) {
+    const error = new Error('Refresh token is required');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const user = await User.findOne({ refreshToken });
+  
+  if (!user) {
+    const error = new Error('Invalid refresh token');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  if (user.isSuspended) {
+    const error = new Error('Account is suspended');
+    error.statusCode = 403;
+    throw error;
+  }
+
+  if (user.isDeleted) {
+    const error = new Error('Account not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const tokens = generateTokens(user);
+  
+  return {
+    user: {
+      id: user._id,
+      email: user.email,
+      firstName: user.profile.firstName,
+      lastName: user.profile.lastName,
+      role: user.role,
+      avatar: user.profile.avatar,
+    },
+    ...tokens,
+  };
+};
+
+const logout = async (userId) => {
+  if (!userId) {
+    const error = new Error('User ID is required');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const user = await User.findById(userId);
+  
+  if (!user) {
+    const error = new Error('User not found');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  // Clear the refresh token
+  user.refreshToken = undefined;
+  await user.save();
+
+  return { message: 'Logout successful' };
+};
+
 module.exports = {
   register,
   login,
+  refreshToken,
+  logout,
   requestPasswordReset,
   resetPassword,
 };
