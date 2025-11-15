@@ -349,7 +349,7 @@ const checkAvailability = async (req, res, next) => {
   try {
     const { doctor, date, time, duration = 30 } = req.body;
 
-    if (!doctor || !date || !time) {
+    if (!doctor && !date && !time) {
       throw new AppError('Doctor, date, and time are required', 400);
     }
 

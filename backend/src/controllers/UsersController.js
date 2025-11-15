@@ -48,8 +48,8 @@ const refreshToken = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
-    await AuthService.logout(refreshToken);
+    const userId = req.user.id;
+    await AuthService.logout(userId);
 
     res.status(200).json({
       success: true,
@@ -63,11 +63,11 @@ const logout = async (req, res, next) => {
 const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
-    await AuthService.forgotPassword(email);
+    const result = await AuthService.requestPasswordReset(email);
 
     res.status(200).json({
       success: true,
-      message: 'Password reset email sent',
+      message: result.message,
     });
   } catch (error) {
     next(error);

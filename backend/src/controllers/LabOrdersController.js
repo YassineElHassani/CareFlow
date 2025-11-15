@@ -85,11 +85,23 @@ class LabOrdersController {
         throw new ApiError(400, 'Invalid test index');
       }
 
+      // Handle file upload if present
+      let fileInfo = null;
+      if (req.file) {
+        fileInfo = {
+          buffer: req.file.buffer,
+          originalName: req.file.originalname,
+          mimeType: req.file.mimetype,
+          size: req.file.size,
+        };
+      }
+
       const labOrder = await LabOrderService.uploadTestResult(
         req.params.id,
         testIndex,
         req.body,
         req.user._id,
+        fileInfo,
       );
 
       res.status(200).json({
