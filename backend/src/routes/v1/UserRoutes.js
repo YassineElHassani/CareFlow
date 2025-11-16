@@ -195,7 +195,7 @@ router.post('/refresh-token', UsersController.refreshToken);
  *       400:
  *         description: Bad request
  */
-router.post('/logout', UsersController.logout);
+router.post('/logout', AuthMiddleware.authenticate, UsersController.logout);
 /**
  * @swagger
  * /users/forgot-password:

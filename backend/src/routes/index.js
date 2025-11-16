@@ -11,6 +11,7 @@ const doctorRoutes = require('./v1/DoctorRoutes');
 const prescriptionRoutes = require('./v1/PrescriptionRoutes');
 const pharmacyRoutes = require('./v1/PharmacyRoutes');
 const labOrderRoutes = require('./v1/LabOrderRoutes');
+const consultationRoutes = require('./v1/ConsultationRoutes');
 
 // Mount routes with prefixes
 router.use('/users', userRoutes);
@@ -20,7 +21,7 @@ router.use('/doctors', doctorRoutes);
 router.use('/prescriptions', prescriptionRoutes);
 router.use('/pharmacies', pharmacyRoutes);
 router.use('/lab-orders', labOrderRoutes);
-
+router.use('/consultations', consultationRoutes);
 /**
  * @swagger
  * /health:
@@ -199,6 +200,8 @@ router.get('/', (req, res) => {
       patients: '/api/v1/patients',
       appointments: '/api/v1/appointments',
       doctors: '/api/v1/doctors',
+      consultations: '/api/v1/consultations',
+      prescriptions: '/api/v1/prescriptions'
     },
   });
 });
