@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const LabOrdersController = require('../../controllers/LabOrdersController');
 const { authenticate, authorize } = require('../../middlewares/AuthMiddleware');
+const { uploadSingle } = require('../../middlewares/UploadMiddleware');
 
 /**
  * @swagger
@@ -210,7 +211,7 @@ router.post('/:id/specimen-collection', authenticate, authorize(['nurse', 'lab-t
  *       200:
  *         description: Test result uploaded successfully
  */
-router.post('/:id/tests/:testIndex/result', authenticate, authorize(['lab-technician']), LabOrdersController.uploadTestResult);
+router.post('/:id/tests/:testIndex/result', authenticate, authorize(['lab-technician']), uploadSingle('resultFile'), LabOrdersController.uploadTestResult);
 
 /**
  * @swagger

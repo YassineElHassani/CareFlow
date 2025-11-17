@@ -75,7 +75,7 @@ router.get('/', AuthMiddleware.authorize(['admin', 'doctor', 'nurse', 'secretary
  *     security:
  *       - bearerAuth: []
  */
-router.get('/my/consultations', AuthMiddleware.authorize(['doctor']), ConsultationsController.getMyConsultations);
+router.get(':id/my/consultations', AuthMiddleware.authorize(['doctor']), ConsultationsController.getMyConsultations);
 
 /**
  * @swagger
