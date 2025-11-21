@@ -22,7 +22,32 @@
       "type": "string"
     },
     {
+      "key": "adminAccessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientAccessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userRole",
       "value": "",
       "type": "string"
     },
@@ -58,6 +83,26 @@
     },
     {
       "key": "labOrderId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pharmacistAccessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "pharmacistUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "labTechAccessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "labTechUserId",
       "value": "",
       "type": "string"
     }
@@ -104,7 +149,7 @@
       ]
     },
     {
-      "name": "Authentication",
+      "name": "Authentication & User Management",
       "item": [
         {
           "name": "Register Doctor",
@@ -113,7 +158,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
+                  "if (pm.response.code === 201) {",
                   "    const responseJson = pm.response.json();",
                   "    pm.environment.set('accessToken', responseJson.data.accessToken);",
                   "    pm.environment.set('refreshToken', responseJson.data.refreshToken);",
@@ -134,7 +179,147 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"dr.john@careflow.com\",\n  \"password\": \"Doctor@123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"nationalId\": \"DOC98765\",\n  \"gender\": \"male\",\n  \"phone\": \"+212612345678\",\n  \"dateOfBirth\": \"1980-05-15\",\n  \"address\": {\n    \"street\": \"123 Medical Street\",\n    \"city\": \"Casablanca\",\n    \"state\": \"Casablanca-Settat\",\n    \"country\": \"Morocco\"\n  },\n  \"role\": \"doctor\",\n  \"specialization\": [\"Cardiology\", \"Internal Medicine\"],\n  \"licenseNumber\": \"MED-2024-5678\",\n  \"department\": \"Cardiology\",\n  \"qualifications\": [\"MD\", \"Board Certified Cardiologist\"],\n  \"yearsOfExperience\": 15\n}"
+              "raw": "{\n  \"email\": \"dr.john@careflow.com\",\n  \"password\": \"Doctor@123\",\n  \"role\": \"doctor\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phone\": \"+212612345678\",\n  \"nationalId\":  \"VSS9876578\",\n  \"professionalInfo\": {\n    \"specialization\": [\"Cardiology\", \"Internal Medicine\"],\n    \"licenseNumber\": \"MED-2024-5678\",\n    \"department\": \"Cardiology\",\n    \"qualifications\": [\"MD\", \"Board Certified Cardiologist\"],\n    \"yearsOfExperience\": 15\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('adminAccessToken', responseJson.data.accessToken);",
+                  "    pm.environment.set('adminUserId', responseJson.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@careflow.com\",\n  \"password\": \"Admin@123\",\n  \"role\": \"admin\",\n  \"firstName\": \"System\",\n  \"lastName\": \"Administrator\",\n  \"phone\": \"+212612345670\",\n  \"nationalId\":  \"VSS9876578\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register Patient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('patientAccessToken', responseJson.data.accessToken);",
+                  "    pm.environment.set('patientUserId', responseJson.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"patient@careflow.com\",\n  \"password\": \"Patient@123\",\n  \"role\": \"patient\",\n  \"firstName\": \"Ahmed\",\n  \"lastName\": \"Hassan\",\n  \"phone\": \"+212612345690\",\n  \"nationalId\":  \"VSS9876578\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register Pharmacist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('pharmacistAccessToken', responseJson.data.accessToken);",
+                  "    pm.environment.set('pharmacistUserId', responseJson.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"pharmacist@careflow.com\",\n  \"password\": \"Pharmacist@123\",\n  \"role\": \"pharmacist\",\n  \"firstName\": \"Sarah\",\n  \"lastName\": \"Williams\",\n  \"phone\": \"+212612345695\",\n  \"nationalId\":  \"VSS9876578\",\n  \"professionalInfo\": {\n    \"pharmacyLicense\": \"PHARM-LIC-2024-001\",\n    \"qualifications\": [\"PharmD\", \"Clinical Pharmacist Certification\"],\n    \"yearsOfExperience\": 8\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            }
+          }
+        },
+        {
+          "name": "Register Lab Technician",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('labTechAccessToken', responseJson.data.accessToken);",
+                  "    pm.environment.set('labTechUserId', responseJson.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"labtech@careflow.com\",\n  \"password\": \"LabTech@123\",\n  \"role\": \"lab-technician\",\n  \"firstName\": \"Omar\",\n  \"lastName\": \"Benali\",\n  \"phone\": \"+212612345696\",\n  \"nationalId\":  \"VSS9876578\",\n  \"professionalInfo\": {\n    \"labLicense\": \"LAB-LIC-2024-001\",\n    \"laboratory\": \"CareFlow Medical Laboratory\",\n    \"labSpecialization\": \"Hematology\",\n    \"qualifications\": [\"Medical Laboratory Technician\", \"Hematology Specialist\"],\n    \"yearsOfExperience\": 5\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/users/register",
@@ -155,6 +340,7 @@
                   "    pm.environment.set('accessToken', responseJson.data.accessToken);",
                   "    pm.environment.set('refreshToken', responseJson.data.refreshToken);",
                   "    pm.environment.set('userId', responseJson.data.user.id);",
+                  "    pm.environment.set('userRole', responseJson.data.user.role);",
                   "}"
                 ]
               }
@@ -180,6 +366,86 @@
           }
         },
         {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/refresh-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "refresh-token"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dr.john@careflow.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/forgot-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "forgot-password"]
+            }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"resetToken\",\n  \"newPassword\": \"NewPassword@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "reset-password"]
+            }
+          }
+        },
+        {
           "name": "Get User Profile",
           "request": {
             "method": "GET",
@@ -195,6 +461,163 @@
               "path": ["users", "profile"]
             }
           }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profile\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe Updated\",\n    \"phone\": \"+212612345679\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Doctor@123\",\n  \"newPassword\": \"NewDoctor@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/change-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "change-password"]
+            }
+          }
+        },
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users?page=1&limit=10&role=doctor",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "role",
+                  "value": "doctor"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Suspend User (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Violation of terms of service\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/suspend",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "suspend"]
+            }
+          }
+        },
+        {
+          "name": "Reactivate User (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/reactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}", "reactivate"]
+            }
+          }
+        },
+        {
+          "name": "Delete User (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{userId}}"]
+            }
+          }
         }
       ]
     },
@@ -202,13 +625,74 @@
       "name": "Patient Management",
       "item": [
         {
+          "name": "Get My Patient Record",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "me"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient Statistics (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "stats"]
+            }
+          }
+        },
+        {
+          "name": "Search Patients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/search/Ahmed?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "search", "Ahmed"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Create Patient",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "if (pm.response.code === 200) {",
+                  "if (pm.response.code === 201) {",
                   "    const responseJson = pm.response.json();",
                   "    pm.environment.set('patientId', responseJson.data._id);",
                   "}"
@@ -250,7 +734,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/patients?page=1&limit=10",
+              "raw": "{{baseUrl}}/patients?page=1&limit=10&gender=male&bloodType=A%2B",
               "host": ["{{baseUrl}}"],
               "path": ["patients"],
               "query": [
@@ -261,6 +745,14 @@
                 {
                   "key": "limit",
                   "value": "10"
+                },
+                {
+                  "key": "gender",
+                  "value": "male"
+                },
+                {
+                  "key": "bloodType",
+                  "value": "A+"
                 }
               ]
             }
@@ -284,7 +776,49 @@
           }
         },
         {
-          "name": "Search Patients",
+          "name": "Update Patient",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contact\": {\n    \"phone\": \"+212612345692\",\n    \"email\": \"ahmed.hassan.updated@email.com\"\n  },\n  \"medicalInfo\": {\n    \"allergies\": [\"Penicillin\", \"Pollen\"],\n    \"chronicConditions\": [\"Hypertension\", \"Diabetes Type 2\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Patient (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient Medical History",
           "request": {
             "method": "GET",
             "header": [
@@ -294,9 +828,101 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/patients/search/Ahmed",
+              "raw": "{{baseUrl}}/patients/{{patientId}}/medical-history",
               "host": ["{{baseUrl}}"],
-              "path": ["patients", "search", "Ahmed"]
+              "path": ["patients", "{{patientId}}", "medical-history"]
+            }
+          }
+        },
+        {
+          "name": "Add Patient Allergy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"allergen\": \"Shellfish\",\n  \"severity\": \"moderate\",\n  \"reaction\": \"Hives and swelling\",\n  \"dateDiscovered\": \"2024-01-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/allergies",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "allergies"]
+            }
+          }
+        },
+        {
+          "name": "Add Patient Medication",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Metformin\",\n  \"dosage\": \"500mg\",\n  \"frequency\": \"Twice daily\",\n  \"startDate\": \"2024-01-01\",\n  \"prescribedBy\": \"{{doctorId}}\",\n  \"indication\": \"Type 2 Diabetes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/medications",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "medications"]
+            }
+          }
+        },
+        {
+          "name": "Add Chronic Condition",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"condition\": \"Diabetes Mellitus Type 2\",\n  \"icd10Code\": \"E11\",\n  \"diagnosedDate\": \"2024-01-01\",\n  \"severity\": \"moderate\",\n  \"status\": \"active\",\n  \"notes\": \"Well controlled with medication\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/conditions",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "conditions"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient by User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "user", "{{userId}}"]
             }
           }
         }
@@ -311,10 +937,44 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/doctors?page=1&limit=10",
+              "raw": "{{baseUrl}}/doctors?page=1&limit=10&specialization=Cardiology&isActive=true",
               "host": ["{{baseUrl}}"],
               "path": ["doctors"],
               "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "specialization",
+                  "value": "Cardiology"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Doctors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/doctors/search?q=cardiology&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cardiology"
+                },
                 {
                   "key": "page",
                   "value": "1"
@@ -328,20 +988,14 @@
           }
         },
         {
-          "name": "Search Doctors",
+          "name": "Get Doctor by ID",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/doctors/search?q=cardiology",
+              "raw": "{{baseUrl}}/doctors/{{doctorId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["doctors", "search"],
-              "query": [
-                {
-                  "key": "q",
-                  "value": "cardiology"
-                }
-              ]
+              "path": ["doctors", "{{doctorId}}"]
             }
           }
         },
@@ -351,13 +1005,40 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/doctors/{{doctorId}}/availability?date=2025-10-19",
+              "raw": "{{baseUrl}}/doctors/{{doctorId}}/availability?date=2025-10-30",
               "host": ["{{baseUrl}}"],
               "path": ["doctors", "{{doctorId}}", "availability"],
               "query": [
                 {
                   "key": "date",
-                  "value": "2025-10-19"
+                  "value": "2025-10-30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Doctor Appointments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/doctors/{{doctorId}}/appointments?date=2025-10-30&status=scheduled",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors", "{{doctorId}}", "appointments"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2025-10-30"
+                },
+                {
+                  "key": "status",
+                  "value": "scheduled"
                 }
               ]
             }
@@ -368,6 +1049,105 @@
     {
       "name": "Appointment Management",
       "item": [
+        {
+          "name": "Get My Appointments (Patient)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/my-appointments?status=scheduled&fromDate=2025-10-30&toDate=2025-11-30&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments", "my-appointments"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "scheduled"
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-10-30"
+                },
+                {
+                  "key": "toDate",
+                  "value": "2025-11-30"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Schedule (Doctor)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/my-schedule?date=2025-10-30&status=scheduled&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments", "my-schedule"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2025-10-30"
+                },
+                {
+                  "key": "status",
+                  "value": "scheduled"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Check Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"doctor\": \"{{doctorId}}\",\n  \"scheduledDate\": \"2025-10-30\",\n  \"scheduledTime\": \"10:00\",\n  \"duration\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/check-availability",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments", "check-availability"]
+            }
+          }
+        },
         {
           "name": "Create Appointment",
           "event": [
@@ -397,7 +1177,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patient\": \"{{patientId}}\",\n  \"doctor\": \"{{doctorId}}\",\n  \"scheduledDate\": \"2025-10-19\",\n  \"scheduledTime\": \"10:00\",\n  \"duration\": 30,\n  \"type\": \"consultation\",\n  \"chiefComplaint\": \"Annual checkup and blood pressure monitoring\"\n}"
+              "raw": "{\n  \"patient\": \"{{patientId}}\",\n  \"doctor\": \"{{doctorId}}\",\n  \"scheduledDate\": \"2025-10-30\",\n  \"scheduledTime\": \"10:00\",\n  \"duration\": 30,\n  \"type\": \"consultation\",\n  \"chiefComplaint\": \"Annual checkup and blood pressure monitoring\",\n  \"priority\": \"routine\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/appointments",
@@ -407,7 +1187,7 @@
           }
         },
         {
-          "name": "List All Appointments",
+          "name": "List All Appointments (Staff)",
           "request": {
             "method": "GET",
             "header": [
@@ -417,7 +1197,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/appointments?page=1&limit=10",
+              "raw": "{{baseUrl}}/appointments?page=1&limit=10&status=scheduled&doctor={{doctorId}}&patient={{patientId}}&fromDate=2025-10-30",
               "host": ["{{baseUrl}}"],
               "path": ["appointments"],
               "query": [
@@ -428,6 +1208,22 @@
                 {
                   "key": "limit",
                   "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "scheduled"
+                },
+                {
+                  "key": "doctor",
+                  "value": "{{doctorId}}"
+                },
+                {
+                  "key": "patient",
+                  "value": "{{patientId}}"
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-10-30"
                 }
               ]
             }
@@ -451,6 +1247,56 @@
           }
         },
         {
+          "name": "Update Appointment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scheduledDate\": \"2025-10-31\",\n  \"scheduledTime\": \"14:00\",\n  \"duration\": 45,\n  \"chiefComplaint\": \"Follow-up for blood pressure management\",\n  \"notes\": \"Patient requested afternoon appointment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{appointmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments", "{{appointmentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Appointment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\",\n  \"notes\": \"Patient confirmed attendance\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{appointmentId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments", "{{appointmentId}}", "status"]
+            }
+          }
+        },
+        {
           "name": "Cancel Appointment",
           "request": {
             "method": "PATCH",
@@ -466,12 +1312,29 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cancellationReason\": \"Patient requested to reschedule\"\n}"
+              "raw": "{\n  \"cancellationReason\": \"Patient requested to reschedule due to emergency\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/appointments/{{appointmentId}}/cancel",
               "host": ["{{baseUrl}}"],
               "path": ["appointments", "{{appointmentId}}", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "Delete Appointment (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/appointments/{{appointmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments", "{{appointmentId}}"]
             }
           }
         },
@@ -491,7 +1354,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"patient\": \"{{patientId}}\",\n  \"doctor\": \"{{doctorId}}\",\n  \"scheduledDate\": \"2025-10-19\",\n  \"scheduledTime\": \"10:15\",\n  \"duration\": 30,\n  \"type\": \"follow-up\",\n  \"chiefComplaint\": \"Test conflict detection - should fail with 409\"\n}"
+              "raw": "{\n  \"patient\": \"{{patientId}}\",\n  \"doctor\": \"{{doctorId}}\",\n  \"scheduledDate\": \"2025-10-30\",\n  \"scheduledTime\": \"10:15\",\n  \"duration\": 30,\n  \"type\": \"follow-up\",\n  \"chiefComplaint\": \"Test conflict detection - should fail with 409\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/appointments",
@@ -503,7 +1366,7 @@
       ]
     },
     {
-      "name": "Consultations",
+      "name": "Consultation Management",
       "item": [
         {
           "name": "Create Consultation",
@@ -544,7 +1407,7 @@
           }
         },
         {
-          "name": "Get Consultation by ID",
+          "name": "Get All Consultations",
           "request": {
             "method": "GET",
             "header": [
@@ -554,24 +1417,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/consultations/{{consultationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["consultations", "{{consultationId}}"]
-            }
-          }
-        },
-        {
-          "name": "List All Consultations",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/consultations?page=1&limit=10",
+              "raw": "{{baseUrl}}/consultations?page=1&limit=10&status=in-progress&fromDate=2025-10-01",
               "host": ["{{baseUrl}}"],
               "path": ["consultations"],
               "query": [
@@ -582,8 +1428,60 @@
                 {
                   "key": "limit",
                   "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "in-progress"
+                },
+                {
+                  "key": "fromDate",
+                  "value": "2025-10-01"
                 }
               ]
+            }
+          }
+        },
+        {
+          "name": "Get My Consultations (Doctor)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/my/consultations?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "my", "consultations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Consultation Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/stats/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "stats", "summary"]
             }
           }
         },
@@ -605,6 +1503,90 @@
           }
         },
         {
+          "name": "Get Doctor Consultations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/doctor/{{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "doctor", "{{doctorId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Consultation by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Consultation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assessment\": \"Updated: Stable angina pectoris confirmed by ECG\",\n  \"plan\": \"Continue aspirin therapy. Add beta-blocker. Schedule stress test. Follow-up in 2 weeks.\",\n  \"notes\": \"Patient shows improvement with current treatment plan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Vital Signs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bloodPressure\": {\n    \"systolic\": 140,\n    \"diastolic\": 85\n  },\n  \"heartRate\": 82,\n  \"temperature\": {\n    \"value\": 36.8,\n    \"unit\": \"celsius\"\n  },\n  \"respiratoryRate\": 18,\n  \"oxygenSaturation\": 99,\n  \"painLevel\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}/vital-signs",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}", "vital-signs"]
+            }
+          }
+        },
+        {
           "name": "Add Diagnosis",
           "request": {
             "method": "POST",
@@ -620,19 +1602,44 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"code\": \"I20.0\",\n  \"name\": \"Unstable angina\",\n  \"severity\": \"moderate\",\n  \"notes\": \"Patient requires cardiac workup\"\n}"
+              "raw": "{\n  \"code\": \"I20.0\",\n  \"name\": \"Unstable angina\",\n  \"severity\": \"moderate\",\n  \"notes\": \"Patient requires cardiac workup and monitoring\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/consultations/{{consultationId}}/diagnosis",
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}/diagnoses",
               "host": ["{{baseUrl}}"],
-              "path": ["consultations", "{{consultationId}}", "diagnosis"]
+              "path": ["consultations", "{{consultationId}}", "diagnoses"]
+            }
+          }
+        },
+        {
+          "name": "Add Procedure",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"93000\",\n  \"name\": \"Electrocardiogram (ECG)\",\n  \"description\": \"12-lead ECG to evaluate cardiac rhythm and conduction\",\n  \"performedAt\": \"2025-10-30T10:30:00Z\",\n  \"outcome\": \"Normal sinus rhythm, no acute changes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}/procedures",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}", "procedures"]
             }
           }
         },
         {
           "name": "Complete Consultation",
           "request": {
-            "method": "POST",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -645,11 +1652,28 @@
               "path": ["consultations", "{{consultationId}}", "complete"]
             }
           }
+        },
+        {
+          "name": "Delete Consultation",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/consultations/{{consultationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["consultations", "{{consultationId}}"]
+            }
+          }
         }
       ]
     },
     {
-      "name": "Prescriptions",
+      "name": "Prescription Management",
       "item": [
         {
           "name": "Create Prescription",
@@ -680,12 +1704,51 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"consultation\": \"{{consultationId}}\",\n  \"patient\": \"{{patientId}}\",\n  \"medications\": [\n    {\n      \"name\": \"Aspirin\",\n      \"genericName\": \"Acetylsalicylic Acid\",\n      \"dosage\": \"81mg\",\n      \"route\": \"oral\",\n      \"frequency\": \"Once daily\",\n      \"duration\": \"30 days\",\n      \"quantity\": 30,\n      \"refills\": 2,\n      \"instructions\": \"Take with food to avoid stomach upset\"\n    },\n    {\n      \"name\": \"Atorvastatin\",\n      \"genericName\": \"Atorvastatin Calcium\",\n      \"dosage\": \"20mg\",\n      \"route\": \"oral\",\n      \"frequency\": \"Once daily at bedtime\",\n      \"duration\": \"30 days\",\n      \"quantity\": 30,\n      \"refills\": 2,\n      \"instructions\": \"Take at bedtime. Avoid grapefruit juice.\"\n    }\n  ],\n  \"notes\": \"Monitor for muscle pain or weakness. Follow up in 4 weeks for lipid panel.\"\n}"
+              "raw": "{\n  \"consultationId\": \"{{consultationId}}\",\n  \"medications\": [\n    {\n      \"name\": \"Aspirin\",\n      \"genericName\": \"Acetylsalicylic Acid\",\n      \"dosage\": \"81mg\",\n      \"route\": \"oral\",\n      \"frequency\": \"Once daily\",\n      \"duration\": \"30 days\",\n      \"quantity\": 30,\n      \"refills\": 2,\n      \"instructions\": \"Take with food to avoid stomach upset\"\n    },\n    {\n      \"name\": \"Atorvastatin\",\n      \"genericName\": \"Atorvastatin Calcium\",\n      \"dosage\": \"20mg\",\n      \"route\": \"oral\",\n      \"frequency\": \"Once daily at bedtime\",\n      \"duration\": \"30 days\",\n      \"quantity\": 30,\n      \"refills\": 2,\n      \"instructions\": \"Take at bedtime. Avoid grapefruit juice.\"\n    }\n  ],\n  \"notes\": \"Monitor for muscle pain or weakness. Follow up in 4 weeks for lipid panel.\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/prescriptions",
               "host": ["{{baseUrl}}"],
               "path": ["prescriptions"]
+            }
+          }
+        },
+        {
+          "name": "Get All Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions?page=1&limit=10&status=signed&patient={{patientId}}&doctor={{doctorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "signed"
+                },
+                {
+                  "key": "patient",
+                  "value": "{{patientId}}"
+                },
+                {
+                  "key": "doctor",
+                  "value": "{{doctorId}}"
+                }
+              ]
             }
           }
         },
@@ -707,29 +1770,27 @@
           }
         },
         {
-          "name": "List All Prescriptions",
+          "name": "Update Prescription",
           "request": {
-            "method": "GET",
+            "method": "PUT",
             "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
               {
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medications\": [\n    {\n      \"name\": \"Aspirin\",\n      \"genericName\": \"Acetylsalicylic Acid\",\n      \"dosage\": \"81mg\",\n      \"route\": \"oral\",\n      \"frequency\": \"Once daily\",\n      \"duration\": \"60 days\",\n      \"quantity\": 60,\n      \"refills\": 3,\n      \"instructions\": \"Take with food to avoid stomach upset. Extended duration.\"\n    }\n  ],\n  \"notes\": \"Updated prescription duration. Monitor for side effects.\"\n}"
+            },
             "url": {
-              "raw": "{{baseUrl}}/prescriptions?page=1&limit=10",
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["prescriptions"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
+              "path": ["prescriptions", "{{prescriptionId}}"]
             }
           }
         },
@@ -776,19 +1837,27 @@
           }
         },
         {
-          "name": "Get Patient Prescriptions",
+          "name": "Cancel Prescription",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
               {
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Patient reported adverse reaction to medication\"\n}"
+            },
             "url": {
-              "raw": "{{baseUrl}}/prescriptions/patient/{{patientId}}",
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/cancel",
               "host": ["{{baseUrl}}"],
-              "path": ["prescriptions", "patient", "{{patientId}}"]
+              "path": ["prescriptions", "{{prescriptionId}}", "cancel"]
             }
           }
         },
@@ -810,37 +1879,74 @@
           }
         },
         {
-          "name": "Cancel Prescription",
+          "name": "Get Patient Prescriptions",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
               {
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"reason\": \"Patient reported adverse reaction\"\n}"
-            },
             "url": {
-              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/cancel",
+              "raw": "{{baseUrl}}/prescriptions/patient/{{patientId}}?status=active&page=1&limit=10",
               "host": ["{{baseUrl}}"],
-              "path": ["prescriptions", "{{prescriptionId}}", "cancel"]
+              "path": ["prescriptions", "patient", "{{patientId}}"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "active"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Doctor Prescriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/doctor/{{doctorId}}?status=signed&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "doctor", "{{doctorId}}"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "signed"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
             }
           }
         }
       ]
     },
     {
-      "name": "Pharmacies",
+      "name": "Pharmacy Management",
       "item": [
         {
-          "name": "Create Pharmacy",
+          "name": "Create Pharmacy (Admin)",
           "event": [
             {
               "listen": "test",
@@ -883,7 +1989,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/pharmacies?page=1&limit=10",
+              "raw": "{{baseUrl}}/pharmacies?page=1&limit=10&city=Casablanca&isActive=true&is24Hours=false&search=CareFlow",
               "host": ["{{baseUrl}}"],
               "path": ["pharmacies"],
               "query": [
@@ -894,6 +2000,22 @@
                 {
                   "key": "limit",
                   "value": "10"
+                },
+                {
+                  "key": "city",
+                  "value": "Casablanca"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true"
+                },
+                {
+                  "key": "is24Hours",
+                  "value": "false"
+                },
+                {
+                  "key": "search",
+                  "value": "CareFlow"
                 }
               ]
             }
@@ -912,24 +2034,44 @@
           }
         },
         {
-          "name": "Search Pharmacies",
+          "name": "Update Pharmacy (Admin)",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contact\": {\n    \"phone\": \"+212522123457\",\n    \"email\": \"updated@careflowpharmacy.com\",\n    \"website\": \"https://careflowpharmacy.com\"\n  },\n  \"servicesOffered\": [\"prescription-dispensing\", \"otc-medications\", \"consultation\", \"home-delivery\", \"vaccination\"]\n}"
+            },
             "url": {
-              "raw": "{{baseUrl}}/pharmacies?search=CareFlow&city=Casablanca",
+              "raw": "{{baseUrl}}/pharmacies/{{pharmacyId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["pharmacies"],
-              "query": [
-                {
-                  "key": "search",
-                  "value": "CareFlow"
-                },
-                {
-                  "key": "city",
-                  "value": "Casablanca"
-                }
-              ]
+              "path": ["pharmacies", "{{pharmacyId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Pharmacy (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/pharmacies/{{pharmacyId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["pharmacies", "{{pharmacyId}}"]
             }
           }
         },
@@ -944,13 +2086,21 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/pharmacies/{{pharmacyId}}/prescriptions?status=sent",
+              "raw": "{{baseUrl}}/pharmacies/{{pharmacyId}}/prescriptions?status=sent&page=1&limit=10",
               "host": ["{{baseUrl}}"],
               "path": ["pharmacies", "{{pharmacyId}}", "prescriptions"],
               "query": [
                 {
                   "key": "status",
                   "value": "sent"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
                 }
               ]
             }
@@ -972,7 +2122,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicationIndex\": 0,\n  \"dispensedQuantity\": 30\n}"
+              "raw": "{\n  \"medicationIndex\": 0,\n  \"dispensedQuantity\": 30,\n  \"batchNumber\": \"BATCH-2024-001\",\n  \"expiryDate\": \"2026-12-31\",\n  \"notes\": \"Patient counseled on proper usage\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/pharmacies/prescriptions/{{prescriptionId}}/dispense",
@@ -997,7 +2147,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"medicationIndex\": 1,\n  \"reason\": \"Out of stock, expected restock in 3 days\"\n}"
+              "raw": "{\n  \"medicationIndex\": 1,\n  \"reason\": \"Out of stock, expected restock in 3 days\",\n  \"estimatedAvailability\": \"2025-11-02\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/pharmacies/prescriptions/{{prescriptionId}}/mark-unavailable",
@@ -1009,7 +2159,7 @@
       ]
     },
     {
-      "name": "Lab Orders",
+      "name": "Laboratory Management",
       "item": [
         {
           "name": "Create Lab Order",
@@ -1050,6 +2200,49 @@
           }
         },
         {
+          "name": "Get All Lab Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders?page=1&limit=10&patient={{patientId}}&doctor={{doctorId}}&status=pending&priority=routine",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "patient",
+                  "value": "{{patientId}}"
+                },
+                {
+                  "key": "doctor",
+                  "value": "{{doctorId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "priority",
+                  "value": "routine"
+                }
+              ]
+            }
+          }
+        },
+        {
           "name": "Get Lab Order by ID",
           "request": {
             "method": "GET",
@@ -1063,33 +2256,6 @@
               "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}",
               "host": ["{{baseUrl}}"],
               "path": ["lab-orders", "{{labOrderId}}"]
-            }
-          }
-        },
-        {
-          "name": "List All Lab Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/lab-orders?page=1&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["lab-orders"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                }
-              ]
             }
           }
         },
@@ -1109,7 +2275,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"collectedBy\": \"{{userId}}\",\n  \"collectedAt\": \"2025-10-26T10:30:00Z\",\n  \"notes\": \"Specimen collected without complications\"\n}"
+              "raw": "{\n  \"collectedBy\": \"{{userId}}\",\n  \"collectedAt\": \"2025-10-30T10:30:00Z\",\n  \"specimenCondition\": \"good\",\n  \"notes\": \"Specimen collected without complications. Patient fasted for 12 hours.\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/specimen-collection",
@@ -1124,17 +2290,54 @@
             "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
                 "key": "Authorization",
                 "value": "Bearer {{accessToken}}"
               }
             ],
             "body": {
-              "mode": "raw",
-              "raw": "{\n  \"value\": \"6.8\",\n  \"unit\": \"g/dL\",\n  \"referenceRange\": \"6.0-8.0 g/dL\",\n  \"flag\": \"normal\",\n  \"interpretation\": \"Hemoglobin A1c within normal range\"\n}"
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "value",
+                  "value": "6.8",
+                  "type": "text"
+                },
+                {
+                  "key": "unit",
+                  "value": "g/dL",
+                  "type": "text"
+                },
+                {
+                  "key": "referenceRange",
+                  "value": "6.0-8.0 g/dL",
+                  "type": "text"
+                },
+                {
+                  "key": "flag",
+                  "value": "normal",
+                  "type": "text"
+                },
+                {
+                  "key": "interpretation",
+                  "value": "Hemoglobin A1c within normal range indicating good glucose control",
+                  "type": "text"
+                },
+                {
+                  "key": "performedBy",
+                  "value": "{{userId}}",
+                  "type": "text"
+                },
+                {
+                  "key": "performedAt",
+                  "value": "2025-10-30T14:15:00Z",
+                  "type": "text"
+                },
+                {
+                  "key": "resultFile",
+                  "type": "file",
+                  "src": "/path/to/lab-result.pdf"
+                }
+              ]
             },
             "url": {
               "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/tests/2/result",
@@ -1159,7 +2362,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"completed\"\n}"
+              "raw": "{\n  \"status\": \"completed\",\n  \"notes\": \"Test completed successfully with normal results\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/tests/2/status",
@@ -1184,46 +2387,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"reportSummary\": \"All test results within normal limits. No critical findings.\",\n  \"recommendations\": \"Continue current treatment. Repeat lipid panel in 6 months.\"\n}"
+              "raw": "{\n  \"reportSummary\": \"All test results within normal limits. No critical findings identified.\",\n  \"recommendations\": \"Continue current treatment plan. Repeat lipid panel in 6 months for routine monitoring.\",\n  \"criticalValues\": [],\n  \"reviewedBy\": \"{{userId}}\",\n  \"reviewedAt\": \"2025-10-30T16:00:00Z\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/finalize-report",
               "host": ["{{baseUrl}}"],
               "path": ["lab-orders", "{{labOrderId}}", "finalize-report"]
-            }
-          }
-        },
-        {
-          "name": "Get Patient Lab Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/lab-orders/patient/{{patientId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["lab-orders", "patient", "{{patientId}}"]
-            }
-          }
-        },
-        {
-          "name": "Get Lab Technician Dashboard",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{accessToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/lab-orders/dashboard/technician",
-              "host": ["{{baseUrl}}"],
-              "path": ["lab-orders", "dashboard", "technician"]
             }
           }
         },
@@ -1243,12 +2412,91 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"reason\": \"Patient requested cancellation\"\n}"
+              "raw": "{\n  \"reason\": \"Patient requested cancellation due to scheduling conflict\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/lab-orders/{{labOrderId}}/cancel",
               "host": ["{{baseUrl}}"],
               "path": ["lab-orders", "{{labOrderId}}", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "Get Patient Lab Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/patient/{{patientId}}?status=completed&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "patient", "{{patientId}}"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "completed"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Doctor Lab Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/doctor/{{doctorId}}?status=pending&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "doctor", "{{doctorId}}"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Lab Technician Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/lab-orders/dashboard/technician",
+              "host": ["{{baseUrl}}"],
+              "path": ["lab-orders", "dashboard", "technician"]
             }
           }
         }
